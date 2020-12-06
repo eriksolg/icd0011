@@ -1,0 +1,148 @@
+Projekti 7. osa
+
+Kasutatavad tehnoloogiad: Servlet, Spring Core, HsqlDb, Gradle
+
+1. Pange oma rakendus kasutama Spring Core raamistikku ja Hsql andmebaasi. 
+   Spring-i osaks jääb DataSource ja dao objektide loomine. Lisaks peaks 
+   andmebaasiga suhtluseks kasutama Spring-i võimalusi (JdbcTemplate, 
+   SimpleJdbcInsert, ResourceDatabasePopulator).
+   
+   Test kontrollib, et teie koodis ei oleks Jdbc otse kasutamist. Seepärast 
+   peate testide lokaalselt käivitamisel ka oma projekti lähtekoodi asukoha 
+   ette andma. Testis on väli pathToProjectSourceCode, mille peaksite ära täitma.
+
+   Spring-i konteksti loomine peaks toimuma rakenduse käivitamisel 
+   ServletContextListener-i contextInitialized() meetodis.
+
+2. Lisage rakendusele andmete valideerimise funktsionaalsus.
+
+   Valideerimise ainus reegel on see, et tellimuse number peab olema 
+   vähemalt 2 märki pikk. Kui saadetakse selline tellimus, mis ei vasta
+   reeglile, siis peaks rakendus tagastama (senise postitatud tellimuse 
+   asemel) veateated. Praegu võib olla vaid üks veateade, hiljem tuleb neid juurde.
+   
+   Veateadete json-i loomiseks ObjectMapper-i abil on teil vaja kahte Java klassi.
+   Nt. https://bitbucket.org/mkalmo/hwtests/src/master/src/test/java/tests/model/ValidationErrors.java
+   
+   Lisaks peaks olema Http tagastuskood 400 mitte 200: response.setStatus(400);
+   
+   Vastuse näide (kui postitati reeglile mittevastav tellimus):
+   
+   {
+      "errors": [
+          {
+             "code": "too_short_number"
+          }
+      ]
+   }
+
+3. See ülesanne ei ole tingimata kohustuslik. Kui see jääb tegemata saate 
+   maksimaalse 5 punkti asemel 3.
+
+   Kirjutage lihtne raamistik, mis peidab kasutaja eest servletiga seotud 
+   detailid. Selle faili lõpus on toodud koodi näide, milline võiks teie 
+   rakenduse kood välja näha.
+   
+   Kontrolleri klass on märgistatud annotatsiooniga, mille abil see Spring-i 
+   kontekstist üles leida.
+   
+   Repository (aka Dao) peaks Spring ise peale süstima (inject).
+
+   Kontrolleri klassis on meetodid mis on märgistatud (ise loodud) annotatsioonidega.
+   
+   Kui meetodil on annotatsioon @Get("/api/v2/orders"), siis peaks see 
+   meetod käima minema, kui meie rakenduse vastava aadressi poole pöördutakse.
+   
+   Annotatsioonil määratud aadress võib sisaldada ka regulaaravaldist.
+   Nt. @Get("/api/v2/orders/(\\d+)")
+   Sellisele meetodile tuleb suunata kõik päringud, mis sellele avaldisele vastavad.
+   Nt. /api/v2/orders/42, /api/v2/orders/9458, jne.
+   
+   Sellise regulaaravalidsega aadressi puhul tuleb muutuv osa (42, 9458, jne) 
+   välja tõtta ja meetodile parameetriga ette anda. Raamistik peab toetama
+   vaid ühte parameetrit ja selle tüüp (Long, UUID, vms.) võib olla jäigalt 
+   sisse kirutatud (hard coded).
+
+   Kui meetodil on @Post annotatsioon, siis peaks selle meetodi käivitama,
+   ainult juhul, kui tegemist oli POST päringuga.
+   
+   @Post annotatsiooniga märgitud meetod sisaldab ka parameetrit. Raamistik
+   peaks lugema sissetulnud päringust Json info tegema sellest objekti ja 
+   selle meetodi käivitamisel parameetriga kaasa andma. Lihtsustusena 
+   võib arvestada, et alati on üks parameeter. Parameetri tüüp ei tohi olla 
+   raamistikku jäigalt sisse kirutatud (hard coded). Selle tüübi peaks 
+   raamistik lugema vastava meetodi signatuurist (java.lang.reflect.Method.getParameterTypes()).
+
+   Raamistiku üldine tööpõhimõte on järgmine.
+   
+   Meil on üks servlet (Front Controller), mis võtab vastu kõik raamistikule 
+   mõeldud päringud. 
+   
+      ServletRegistration reg = sce.getServletContext().addServlet(...
+      reg.addMapping("/api/v2/*");
+   
+   Kui servlet päringu saab, siis küsib Spring-i käest kõik klassid, mis 
+   on märgitud annotatsiooniga @MyController.
+   
+     ctx.getBeansWithAnnotation(MyController.class)
+   
+   Saadud info põhjal saab küsida Java refleksiooni abil kõik meetodid, 
+   mis on märgitud @Get, @Post või @Delete annotatsiooniga.
+   
+     eachController.getClass().getDeclaredMethods();
+     
+     ja
+     
+     method.getAnnotation(Get.class);
+   
+   Kui leitakse selline meetod, mis päringule vastab, siis see meetod 
+   käivitatakse. Kui antud meetod vajab sisendit, siis peab raamistik
+   selle väljakutsel kaasa andma.
+   
+   Kõik kontrolleri meetodid tagastavad andmed objekti kujul ja raamistiku 
+   ülesanne on vastuse Json kujule teisendamine ja kliendile saatmine.
+
+
+Töötav näidis, mis läbib testid:
+  http://ci.itcollege.ee/icd0011/examples/hw07/
+  
+Projekti lähtekood peab vastama järgmistele stiilireeglitele:
+  https://bitbucket.org/mkalmo/hwtests/src/master/pmd/ruleset.xml
+  
+Projekt peab läbima järgmised testid:
+  https://bitbucket.org/mkalmo/hwtests/src/master/src/test/java/tests/Hw07.java
+
+------------------------------------------------------------------------
+
+@MyController
+public class OrderController {
+
+    private OrderRepository repository;
+
+    public OrderController(OrderRepository repository) {
+        this.repository = repository;
+    }
+
+    @Get("/api/v2/orders")
+    public List<Order> getAllOrders() {
+        ...
+    }
+
+    @Get("/api/v2/orders/(\\d+)")
+    public Order getOrderById(Long id) {
+        ...
+    }
+
+    @Post("/api/v2/orders")
+    public Order createOrder(Order order) {
+        ...
+    }
+
+    @Delete("/api/v2/orders/(\\d+)")
+    public void deleteOrder(Long id) {
+        ...
+    }
+
+}
+
+

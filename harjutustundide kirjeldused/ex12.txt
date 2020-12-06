@@ -1,0 +1,88 @@
+Kotlin
+
+Kloonige https://bitbucket.org/mkalmo/icd0011kotlin repo ja importige see IDE-sse.
+
+1. Käivitage failis samples/String.kt olev kood käsurealt.
+
+   Kompileeritud kood asub kataloogis build/classes/kotlin/main.
+   
+   Lisage kood
+   
+      println("a".padStart(10))
+   
+   ja käivitage uuesti. Nüüd peate käivitamisel kassa andma jar-i, kus 
+   padStart() meetodi kood on.
+
+2. Uurige, milline näeb välja Kotlini Dto klassile vastav Java kood.
+
+   a) Tehke uus Kotlini klass 
+
+   class Person {
+      private val name: String? = null
+   } 
+   
+   Baitkoodile vastava Java koodi saate nii:
+   
+   Tools -> Kotlin -> Show Kotlin Bytecode ja avanevast aknast vajutage "Decompile"
+
+   b) Defineerige väli konstruktoris ja vaadake, mis muutus.
+   
+   class Person (
+      private val name: String? = null
+   )
+
+   c) Eemaldage modifikaator "private" ja vaadake, mis muutus.
+
+   d) Muutke "val" modifikaator "var"-iks ja vaadake, mis muutus.
+   
+   e) Lisage klassi ette modifikaator "data" ja vaadake, mis muutus.
+
+3. Tõlkige toorikus olev Spring Mvc rakendus Javast Kotlinisse.
+
+  a) Tõstke klass Post kataloogist src/main/java kataloogi src/main/kotlin
+     ja laske Idea-l Java kood Kotlini koodiks teisendada.
+     
+     Code -> Convert Java File to Kotlin file.
+  
+     Saadud kood ei vasta selle, mida meie rakendus ootab. Vigade leidmiseks
+     kompileerige projekt. Tehke vajalikud muudatused eelmisest ülesandest 
+     saadud info põhjal.
+  
+     Kui soovime annotatsiooni panna väljale mitte konstruktori parameetrile 
+     peame kirjutama @NotNull asemel @field:NotNull.
+
+  b) Konverteerige klass PostMemoryDao.java. Seekord peaks Idea ilma abita 
+     sobiva koodi tegema.
+
+  c) Konverteerige klass PostController.java. Seekord on peamine probleem selles,
+     et @Valid annotatsioon on vales kohas ja isegi ei jõua baitkoodi.
+     
+     Lisaks sellele on getPosts() meetod väljaks teisendatud, mis küll 
+     töötab aga mis stiili poolest ei sobi.
+
+  d) Konverteerige klass Initializer.java. Siin ei vasta meetodi getRootConfigClasses()
+     sisu signatuuris defineeritud tüübile. 
+     
+     Kirjutage arrayOfNulls(0) asemele arrayOf().
+     
+  e) Konverteerige klass MvcConfig.java.
+  
+     Kotlini klassid on vaikimisi "final" aga Idea teatab, et klass ei 
+     tohiks olla "final". Peaksime lisama modifikaatori "open".
+     
+  f) Konverteerige klass ValidationError.java. See on Dto klass ja siin 
+     peaksime tegema samad muudatused, mis klassi Post juures.
+     
+  g) Konverteerige klass ValidationErrors.java. Kotlini kompilaator ei 
+     arvesta Lomboki annotatsioone. 
+     
+     Võime lasta Kotlinil getteri teha aga antud juhul on see getter
+     ainult ObjectMapper-i jaoks. Sama tulemuse saame, kui paneme väljale 
+     annotatsiooni @JsonProperty.
+     
+  h) Konverteerige klass ControllerErrorHandler.java. 
+     Seekord peaks Idea ilma abita töötava koodi tegema.
+
+4. Valikülesanne. Konverteerige oma iseseisva töö projekt Javast Kotlinisse.
+
+Seletused ja lahendused: https://youtu.be/rESYbfGdWYw

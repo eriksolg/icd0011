@@ -1,0 +1,81 @@
+Projekti 5. osa
+
+Kasutatavad tehnoloogiad: Servlet, Jdbc, PostgreSql, Gradle
+
+Tehtud töö märgistage tag-iga hw05.
+
+1. Panna eelmises osas tehtud rakendus kasutama PostgreSql andmebaasi.
+
+  Rakendus ei pea toetama tellimuse ridade sisestamist. Selle võimaluse 
+  lisame järgmises osas.
+
+  Rakendus peab kasutama ühenduste puuli (connection pool), mille suurus 
+  on maksimaalselt 2 ühendust.
+
+  Puuli ja andmebaasi skeemi loomine peab toimuma rakenduse paigaldamise 
+  ajal, ServletContextListener.contextInitialized() meetodis.
+  
+  Rakenduse sulgemisel (ServletContextListener.contextDestroyed() meetodis) 
+  peate pooli sulgemma. Kogu andmebaasiga suhtlus peab toimuma läbi sellesama 
+  puuli.
+  
+  Andmebaasi skeem (sql laused) peaks olema eraldi failis (nt. schema.sql), 
+  mitte otse Java-sse kirjutatuna.
+  
+  Ühenduse andmed on
+  
+    Host: db.mkalmo.xyz
+    User: teie Bitbucket-i kasutajanimi võimalike muudatustega*
+    Password: projekti esimeses osas valitud salasõna räsi neli esimest märki
+    Database: sama, mis kasutajanimi
+  
+    * Kasutajanime võimalikud muudatused.
+    
+      1) kui teie kasutajanimi sisaldab suuri tähti, siis need peaks muutma 
+         väiketähtedeks.
+         
+      2) kui teie kasutajanimi sisaldab sümboleid peale tähtede ja numbrite, 
+         siis peaksite muutma need alakriipsudeks (_).
+         
+      3) kui teie kasutajanimi ei alga tähega siis peate lisama kasutajanime 
+         ette x-täht.
+    
+      Näited:
+      
+        abc -> abc (jääb samaks)
+        Abc -> abc (suured tähed väikesteks)
+        a-b -> a_b (muud sümbolid alakriipsudeks)
+        1ab -> x1ab (lisatakse x-täht)
+  
+2. Baasiga suhtlemiseks kasutage DAO mustrit. 
+
+3. Sisestatud kirjetele antav id tuleb genereerida andmebaasis (va. 
+   juhul kui kasutade UUID-d).
+
+   Id-de genereerimiseks võite kasutada jada (sequence), 
+   SERIAL võtmesõna või UUID-d.
+  
+4. Lisage juurde võimalus kõigi tellimuste vaatamiseks.
+
+  Päringu näide
+  
+  GET /api/orders HTTP/1.1
+  Host: localhost:8080
+
+  Vastuse näide:
+  
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+  
+  [{ "id": "1", "orderNumber": "A123", "orderRows": null }, ...]
+
+Töötav näidis, mis läbib testid:
+  http://ci.itcollege.ee/icd0011/examples/hw05/
+  
+Projekti lähtekood peab vastama järgmistele stiilireeglitele:
+  https://bitbucket.org/mkalmo/hwtests/src/master/pmd/ruleset.xml
+  
+Projekt peab läbima järgmised testid:
+  https://bitbucket.org/mkalmo/hwtests/src/master/src/test/java/tests/Hw05.java
+
+Stiilireeglite ja testide kasutamise näide on harjutustunni Servleti ülesande juures.

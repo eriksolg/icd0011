@@ -1,0 +1,111 @@
+Spring Core raamistiku kasutamine
+
+Kloonige https://bitbucket.org/mkalmo/icd0011spring repo ja importige see IDE-sse.
+
+Konfiguratsiooniks vajalikud elemendid leiate loengu slaididelt või failist info.txt.
+
+1. Defineerige bean TransferService.
+
+   Testimiseks on klass main.Main.
+
+   a) Failis Config.java kasutage @Bean annotatsiooni loomise meetodil.
+
+   Veenduge, et see töötab küsides kontekstilt TransferService: ctx.getBean(TransferService.class);
+
+   b) Failis Config.java kasutage @ComponentScan annotatsiooni.
+
+   Määrake, et Spring paneks TransferService peale ka BankService objekti.
+
+   Küsige kontekstilt TransferService ja veenduge, et sellel on viide BankService-ile.
+
+2. Veenduge, et TransferService objekt on singelton. 
+   
+   Kontrollimaks, kas objektid on samad saab kasutada meetodit System.identityHashCode(objekt).
+
+   Igal objektil on unikaalne identityHashCode.
+    
+3. Muutke TransferService bean-i skoopi, et iga kord antaks uus objekt.
+   Kontrollige, et see ka nii on.
+
+   @Scope(BeanDefinition.SCOPE_PROTOTYPE) annotatsioon loomise meetodil või komponendil.
+
+4. Tehke läbi Idea andmebaasi tabel ja sisestage mõned isikud.
+
+    Sql laused on failides schema.sql ja data.sql.
+
+5. Tehke PersonDao-sse meetod, mis kasutab Spring-i JdbcTemplate ja tagastab 
+   kõik sisestatud isikud.
+
+   Ühenduse parameetrid on failis application.properties.
+   
+   Kasutage spetsiaalset mapperit ja BeanPropertyRowMapper-it.
+
+6. Tehke PersonDao-sse meetod, isiku sisestamiseks kasutades 
+   SimpleJdbcInsert klassi.
+   
+   Sisestage loodud meetodi abil mõned isikud.
+
+7. Tehke nii, et andmebaasi tabelid ja näidisandmed sisestatakse 
+   DataSoucre objekti loomisel. Sql skriptid on failides schema.sql ja data.sql.
+
+
+8. Jagage konfiguratsiooni fail kaheks: Ühes failis on defineeritud DataSource
+   ja teises falilis on defineeritud kõik muu.
+
+   Konteksti loomisel saab ette anda ka mitu konfiguratsiooni faili.
+   
+      nt. new AnnotationConfigApplicationContext(Config.class, PostgresDataSource.class);
+
+   Kontrollige, et rakendus jäi tööle.
+
+9. Fails HsqlDataSource on mälupõhise andmebaasi DataSource konfiguratsioon.
+
+   Määrake, et see kehtib ainult profiili "hsql" korral.
+   
+   Määrake, et PostgresDataSource kehtib ainult profiili "postgres" korral.
+   
+   Looge kontekst andes ette mõlemad DataSource konfiguratsioonid.
+
+   Enne koodi käivitamist seadke keskonna muutuja, mis ütleb, millist profiili kasutada.
+   
+   Windows: 
+     > set SPRING_PROFILES_ACTIVE=hsql
+     > gradlew runMain
+   
+   Mac, Linux:
+     > export SPRING_PROFILES_ACTIVE=hsql && ./gradlew runMain
+   
+10. Lisage BankService klassi meetoditele logimine kasutades selleks AOP võimalusi.
+
+   Tööga on alustatud klassis LoggingAspect.java.
+   
+   Kui aspekti tööle saate, siis logitakse teateid ainult "INFO" tasemega.
+   
+   Selleks, et ka "DEBUG" tasemega teateid logitaks, muutke log4j2.xml failis 
+   paketi "aop" tase ära.
+   
+   Nüüd logitakse ka "DEBUG" tasemega teateid aga kõik teated on seotud 
+   klassiga LoggingAspect. Kui soovime teateid eristada peksime logija 
+   objekti loomisel vastava klassi ette andma.
+   
+   Millise meetodi käivitamise vahel antud aspekti käivitatakse saame nii:
+   
+      joinPoint.getTarget().getClass()
+   
+   ja selle info põhjal saame sobiva logija teha:
+   
+      Logger logger = LogManager.getLogger(joinPoint.getTarget().getClass());
+      
+   Määrake log4j2.xml failis nii, et ainult EmailService klassi poolt logitavat 
+   infot logitakse "DEBUG" tasemega.
+   
+11. Paketis "framework" on mõned klassid, annotatsioonid ja Spring-i konfiguratsioon.
+
+   Kirjutage kood, mis käivitab kõik meetodid mis vastavad järgmistele tingimustele:
+   
+   - klassid asuvad paketis "framework";
+   - klassidel on annotatsioon @ClassAnnotation;
+   - meetoditel on annotatsioon @MethodAnnotation;
+   - meetodi annotatsiooni parameeter on suurem kui 1.
+
+Seletused ja lahendused: https://youtu.be/pt95GAlnguY

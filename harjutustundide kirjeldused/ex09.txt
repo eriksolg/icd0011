@@ -1,0 +1,97 @@
+Jpa
+
+Kloonige https://bitbucket.org/mkalmo/exjpa repo ja importige see IDE-sse.
+
+Vajalik info loengu slaididelt või failist info.txt.
+
+Andmete hoidmiseks võite kasutada PostgreSql või Hsql andmebaasi.
+
+Kuna Hsql andmebaas on oluliselt kiirem, siis on soovitatava seda kasutada.
+
+Kui soovite Hsql baasis olevat infot nt. Idea vahenditega vaadata peate käivitama
+Hsql andmebaasi serveri. See asub klassis HsqlServer.java.
+
+Idea-st just käivitatud Hsql serveriga ühendumiseks on vajalik
+
+  Database sakk -> + -> Data Source -> HSQLDB
+  
+  Täitke avanevas aknas
+    Driver: HSQLDB (Remote)
+    Host: localhost
+    Database: db1
+
+1. Lisage PersonDao-sse meetod, mis võimaldab isikut sisestada. Isiku 
+   salvestamiseks kasutage Jpa vahendeid.
+   
+   Sisestage kaks isikut.
+   
+   Testimiseks on klass main.Tester.java.
+   
+   Muuhulgas peab tegema järgmist:
+     - salvestatava objekti klass peab olema märgitud annotatsiooniga @Entity.
+     - salvestatava objekti klass peab omama välja, mis on märgistatud 
+       annotatsiooniga @Id.
+     - peab ütlema, kust id-sid saadakse ehk lisama id väljale 
+       annoatatsiooni @GeneratedValue.
+     - peab määrama, kust paketist olemeid otsida.
+     - enne salvestamit tuleb alustada transaktsiooniga ja pärast see 
+       lõpetada (commit).
+       
+   Kuna Jpa puhul on AutoCommit vaikimisi väljas, siis peame salvestamisel 
+   ise transaktsiooni piirid määrama.
+   
+   Selleks on vaja Spring-i konfiguratsioonis määrata @EnableTransactionManagement
+   ja salvestaval meetodil määrata @Transactional.       
+
+2. Lisage meetod, mis loeb kõik isikud.
+
+3. Lisage meetod, mis loeb isiku nime järgi.
+
+4. Lisage meetod, mis võimaldab loetud isikut muuta ja uuesti salvestada.
+   
+   Kontrollige, kas muudatused jõudsid andmebaasi.
+
+5. Lisage isikule seos aadressiga.
+   Isikul võib olla üks aadress ja sama aadress võib kuuluda mitmele 
+   isikule (@OneToOne seos).
+   
+   Kontrollige, et isiku salvestades salvestatakse ka aadress (vaadake 
+   kas jõudis andmebaasi).
+   
+   Alamelementide salvestamiseks on vajalik seose "cascade" atribuut.
+   
+   Kontrollige, et isiku lugemisel loetakse ka aadress välja.
+   
+6. Lisage võimalus, et isikule saaks lisada telefone (@OneToMany seos).
+
+   Alamelementide salvestamiseks on vajalik seose "cascade" atribuut.
+
+   Lisage isikult mõned telefonid ja uurige kuidas näevad andmed välja 
+   andmebaasis.
+
+7. Muutke isiku ja telefonide seost nii, et telefonid ei oleks eraldi 
+   olemid.
+   
+   Telefon on @Embeddable ja seos on @ElementCollection.
+   
+   Uurige kuidas näevad andmed välja andmebaasis.
+
+8. Laadige andmebaasi skeem failist schema.sql:
+
+     var populator = new ResourceDatabasePopulator(
+             new ClassPathResource("schema.sql"));
+   
+     DatabasePopulatorUtils.execute(populator, dataSource);
+
+   Määrake "hibernate.hbm2ddl.auto" väärtuseks "validate".
+
+   Lisage vastavad annotatsioonid (@Table, @Column), et jpa teaks, 
+   kuidas isikuid, telefone ja aadresse olemasoleva skeemiga andmebaasi 
+   salvestada.
+
+9. Tehke abstraktne klass BaseEntity, millest teised olemid pärinevad 
+   ja milles on id väli koos vajalike annotatsioonidega.
+   
+   Baasklassile peab lisama annotatsiooni @MappedSuperclass.
+   
+Lahendused: https://youtu.be/FFlfErAUjSE

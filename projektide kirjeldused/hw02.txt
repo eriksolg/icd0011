@@ -1,0 +1,51 @@
+Projekti 2. osa
+
+Selles osas peaksite looma oma reposse automaatse projekti ehitamise võimaluse.
+
+Ehitamise skript peaks võimaldama käsurealt käivitada Java veebirakenduse,
+milles on üks Servlet (toodud selle teksti lõpus).
+
+Kui kõik on õige, siis peaksid järgmised käsud rakenduse käivitama.
+
+  > git clone https://bitbucket.org/<kasutajanimi>/icd0011
+  
+  > cd icd0011
+  
+  > gradlew appRun           # Windows
+  > ./gradlew appRun         # Mac/Linux
+
+Nüüd peaks peaks veebiserver käima ja aadress http://localhost:8080/hello vastama.
+
+Et ülalnimetatud stsenaarium toimiks on teil vaja:
+  
+  - luua sobiva sisuga build.gradle fail;
+  - luua vastav kataloogistruktuur;
+  - kopida teksti lõpus olev HelloServlet.java kataloogi /src/main/java;
+  - lisada gradle wrapper-i failid.
+
+
+Lõplik commit märgistage tag-iga hw02.
+
+
+HelloServlet.java 
+------------------------------------------------------------------------
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/hello")
+public class HelloServlet extends HttpServlet {
+
+    @Override
+    public void doGet(HttpServletRequest request,
+                       HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+
+        response.getWriter().print("{}");
+    }
+}

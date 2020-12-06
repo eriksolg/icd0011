@@ -1,0 +1,50 @@
+Projekti 9. osa
+
+Kasutatavad tehnoloogiad: Spring Mvc, Jpa, Hsql, Gradle.
+
+Selles osas peaksite kasutusele võtma Jpa raamistiku. Uut funktsionaalsust 
+ei lisandu aga välja peab vahetama andmebaasiga suhtlemise osa (Dao klassi).
+
+Baasi skeem on ette antud (teksti lõpus) ja vastavalt sellele tulevad 
+Jpa seosed (mappings). Etteantud skeem ei ole kuidagi parim või 
+ainuvõimalik aga eesmärk on simuleerida olukorda, kus teile on skeem 
+ette antud ja seda muuta ei saa.
+
+Kui soovite võite antud skeemis muuta andme tüüpe, lisada või eemaldada 
+piiranguid (constraint), lisada indekseid vms. Samaks peab jääma tabelite arv, 
+veergude arv tabelis ja tabelite ning veergude nimed. Samuti on oluline, 
+et id-d võetakse just etteantud jadast (sequence).
+
+Jpa konfiguratsioonis peab olema määratud, et tuleb kontrollida skeemi 
+ja olemite vastavust ehk "hibernate.hbm2ddl.auto" väärtus on "validate".
+
+Testid Jpa kasutust või etteantud skeemi kasutust ei kontrolli aga seda 
+kontrollitakse hiljem.
+
+Projekt peab läbima järgmised testid:
+  https://bitbucket.org/mkalmo/hwtests/src/master/src/test/java/tests/Hw09.java
+
+Töötav näidis:
+  http://ci.itcollege.ee/icd0011/examples/hw09/
+
+------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS order_rows;
+DROP TABLE IF EXISTS orders;
+DROP SEQUENCE IF EXISTS seq1;
+
+CREATE SEQUENCE seq1 AS INTEGER START WITH 1;
+
+CREATE TABLE orders (
+  id BIGINT NOT NULL PRIMARY KEY DEFAULT nextval('seq1'),
+  order_number VARCHAR(255)
+);
+
+CREATE TABLE order_rows (
+  item_name VARCHAR(255),
+  price INT,
+  quantity INT,
+  orders_id BIGINT,
+  FOREIGN KEY (orders_id)
+    REFERENCES orders ON DELETE CASCADE
+);

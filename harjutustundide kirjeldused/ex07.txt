@@ -1,0 +1,130 @@
+Spring Mvc
+
+Kloonige https://bitbucket.org/mkalmo/icd0011mvc repo ja importige see IDE-sse.
+
+Vajalik info loengu slaididelt või failist info.txt.
+
+Ette on antud klientrakendus postituste sisestamiseks. Teie ülesanne on 
+tagarakendus (back end) valmis teha.
+
+Rakenduse käivitamisel asub klientrakendus aadressil http://localhost:8080.
+
+1. Esmalt peaksime tagama, et Spring Mvc rakendus käivitatakse.
+
+   Selleks, et rakendus käivituks peab meil olema klass, mis laiendab klassi AbstractAnnotationConfigDispatcherServletInitializer. Selles klassis peab
+   olema määratud, Spring-i konfiguratsiooni asukoht ja see, mis aadressilt 
+   päringuid vastu võtetakse.
+
+2. Klientrakenduse poolt saadetud päringuid peaks vastu võtma klass PostController.java.
+
+   GET päring aadressile api/posts peaks tagastama sisestatud postitused.
+   Kasutada on klass PostMemoryDao, milles on ka mõned näidisandmed.
+
+3. POST päring aadressile api/posts peaks sisestama uue postituse.
+
+      Vastuse Http kood peaks olema 201.
+   
+      @ResponseStatus(HttpStatus.CREATED)
+
+4. DELETE päring aadressile api/posts/<id> (nt. api/posts/1) peaks 
+   vastava id-ga postituse kustutama.
+
+5. Tehke nii, et kui rakenduses toimub mistahes viga, siis näidataks
+   kliendile teadet "internal error!".
+   
+   Selleks peate tegema meetodi, mis on märgistatud annotatsiooniga
+   @ExceptionHandler ja mille argumendiks on Exception tüüpi objekt.
+   
+   Tehke nii, et see loogika toimiks kõigi kontrollerite puhul (@RestControllerAdvice).
+
+6. Klassis ValidatorTest.java on hibernate-validator teegi kasutamise näide,
+   mis püüab valideerida postituse objekti.
+   
+   Lisage klassile Post JSR303 annotatsioonid, mis nõuavad:
+   
+   "title" väli ei ole null (@NotNull)
+   "title" välja pikkus on 2-50 märki (@Size)
+   "tekst" väli ei ole null (@NotNull)
+   "tekst" välja pikkus on 2-500 märki (@Size)
+
+   Kontrollige, et validaator neid nõudeid ka kontrollib.
+   
+   Tehke väljastatud vigade põhjal Json.
+   
+   { 
+     "errors":[
+       { "code":"<vea kood või veateade>" },
+       ...
+     ]
+   }
+
+   Kasutada on klass ValidationErrors.java, millel on meetod addErrorMessage();
+   
+   Lisage leitud vead selle klassi sisse ja andke tulemus ObjectMapper-ile ette.   
+
+7. Lisage eelmises punktis tehtud valideerimise loogika Spring Mvc 
+   kontrollersisse ValidationController.java meetodisse manualValidation().
+   
+   Proovige Postman-iga seda kasutada postitades aadressile "/api/manual-validation"
+   mingi sisendi.
+
+8. Postitage sisend, mis ei valideeru (nt. {}) aadressile "/api/validation".
+
+   Rakendus peaks erindi viskama: @Valid annotatsioon sisendparameetri 
+   ees käivitab validaatori automaatselt.
+ 
+   Selles kontrolleris on tehtud ka vea halduse meetod nimega handleValidationError().
+   
+   Et Spring selle meetodi valideerimise vea puhul käima paneks peaks sellele 
+   lisama annotatsiooni @ExceptionHandler.
+   
+   Meetodis on näide, kuidas valideerimise veateateateid (FieldError kujul) 
+   kätte saada. Tehke nende vigade põhjal Json, mis tagastatakse kliendile.
+ 
+   Kasutada on klass ValidationErrors.java, millel on meetod addFieldError();
+
+9. Tahaksime sedasama valideerimise loogikat kasutada ka teistes kontrollerites
+   ilma koodi kopeerimata.
+
+   Tehke eraldi klass ValidationAdvice.java, millel on annotatsioon
+   @RestControllerAdvice ja tõstke vea haldamise meetod uude klassi.
+   
+   Veenduge, et valideerimise vigade tagastamise loogika jäi tööle.
+
+10. Lisage valideerimine PostController-i postituse salvestamise meetodile, 
+    mille tegite punktis 3.
+   
+    Kontrollige läbi klientrakenduse, et see töötab.
+
+11. Kontrolleris DateController on näide kuupäev ojekti string-ks teisendamisest.
+
+    Proovige Postman-iga, millise tulemsue annab päring aadressile "/api/date"
+    
+    Teisenduse formaati saame muuta lisades teisendatavale väljale annotatsiooni
+    @JsonFormat(pattern="yyyy-MM-dd")
+    
+    NB! et see töötaks peab projektile lisama ka sõltuvuse teegist jackson-datatype-jsr310.
+    
+    Klassis DateController.java on ka meetod, mis peaks parameetrina 
+    saadetud kuupäeva automaatselt objektiks teisendama.
+    
+    Saatke POST päring "/api/date?date=2020-10-22" ja kontrollige kas see toimib.
+    
+    Ütelge Spring-ile, millises formaadis ta sisendit peab ootama.
+    Selleks on annotatsioon @DateTimeFormat(pattern = "yyyy-MM-dd") 
+    sisendparameetri ees.
+    
+    Veenduge, et see parandadas vea.
+
+12. Klassis MockMvcTests.java on näide, kuidas väljaspool serverit 
+    Spring Mvc rakendust käivitada.
+    
+    Kirjutage näidete põhjal lõpuni meetodid showErrorsOnInvalidInput()
+    ja noErrorsOnValidData().
+    
+    Need testid peaksid kontrollima päringuid aadressile "/posts".
+    
+    Esimesel juhul peaks postitama sisendi, mis ei valideeru ja teisel 
+    juhul korrektse sisendi.
+    
+Seletused ja lahendused: https://youtu.be/cvL_ZkjzQdc
