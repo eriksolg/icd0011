@@ -7,3 +7,6 @@ https://moodle.taltech.ee/course/view.php?id=22847
 
 ## Ex02
 Servletid ja nende loomine, contextid, listenerid, REST processing, Lombok.
+
+## Ex03
+REST, manual JSON parsing.
