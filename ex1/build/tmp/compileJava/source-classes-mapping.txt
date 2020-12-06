@@ -1,0 +1,20 @@
+reflection/Main.java
+ reflection.Main
+reflection/samples/ReadFields.java
+ reflection.samples.ReadFields
+storage/Storage.java
+ storage.Storage
+reflection/FillThisField.java
+ reflection.FillThisField
+common/Person.java
+ common.Person
+common/Post.java
+ common.Post
+storage/Main.java
+ storage.Main
+reflection/samples/WriteToField.java
+ reflection.samples.WriteToField
+mapper/Main.java
+ mapper.Main
+mapper/PersonMapper.java
+ mapper.PersonMapper
