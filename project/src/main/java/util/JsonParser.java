@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class JsonParser {
 
     public static HashMap<String, String> parseJson(String json) {
-        HashMap<String, String> dataContainer = new HashMap<String, String>();
+        HashMap<String, String> dataContainer = new HashMap<>();
 
         json = json.replace('{', ' ').replace('}', ' ').trim();
         for (String property : json.split(",")) {

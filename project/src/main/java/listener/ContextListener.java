@@ -23,4 +23,9 @@ public class ContextListener implements ServletContextListener {
 
         dao.initializeSchema();
     }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+
+    }
 }
