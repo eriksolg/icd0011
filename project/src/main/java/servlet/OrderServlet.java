@@ -1,5 +1,6 @@
 package servlet;
 
+import db.Dao;
 import order.Order;
 import util.JsonParser;
 import util.RequestReader;
@@ -17,26 +18,26 @@ import java.util.HashMap;
 @WebServlet("/api/orders")
 public class OrderServlet extends HttpServlet {
 
-    Long lastOrderId = 0L;
-
+    private Dao dao;
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+    public void init() throws ServletException {
+        this.dao = (Dao) getServletContext().getAttribute("dao");
+        super.init();
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            String input = RequestReader.read(req);
-            HashMap<String, String> dataMap = JsonParser.parseJson(input);
-            String orderNumber = dataMap.get("orderNumber");
-            if (orderNumber == null) {
-                return;
-            }
-            Order order = new Order(lastOrderId++, dataMap.get("orderNumber"));
+        String input = RequestReader.read(req);
+        HashMap<String, String> dataMap = JsonParser.parseJson(input);
+        String orderNumber = dataMap.get("orderNumber");
+        if (orderNumber == null) {
+            return;
+        }
+        Order order = dao.insertOrder(orderNumber);
 
-            PrintWriter writer = resp.getWriter();
-            writer.append(order.toJson());
+        PrintWriter writer = resp.getWriter();
+        writer.append(order.toJson());
 
-            resp.setContentType("application/json");
+        resp.setContentType("application/json");
     }
 }
