@@ -10,3 +10,6 @@ Servletid ja nende loomine, contextid, listenerid, REST processing, Lombok.
 
 ## Ex03
 REST, manual JSON parsing.
+
+## Ex04
+JDBC: pool and connection reusage, Dao, DB queries.
