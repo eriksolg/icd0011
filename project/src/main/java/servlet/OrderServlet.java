@@ -15,39 +15,43 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import java.util.List;
 
 @WebServlet("/api/orders")
 public class OrderServlet extends HttpServlet {
 
     private Dao dao;
-    private Logger logger;
 
     @Override
     public void init() throws ServletException {
         this.dao = (Dao) getServletContext().getAttribute("dao");
-        logger = Logger.getLogger("logger");
         super.init();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Long id = null;
-        try {
-            id = Long.parseLong(req.getParameter("id"));
-        } catch (NumberFormatException e) {
-            logger.severe("Could not parse id");
-            return;
-        }
-        Order order = dao.getOrderById(id);
-        PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
+        PrintWriter writer = resp.getWriter();
 
-        if (order == null) {
-            writer.append("{}");
+        if (req.getParameterMap().containsKey("id")) {
+            Long id = null;
+            try {
+                id = Long.parseLong(req.getParameter("id"));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                return;
+            }
+            Order order = dao.getOrderById(id);
+            if (order == null) {
+                writer.append("{}");
+            } else {
+                writer.append(new ObjectMapper().writeValueAsString(order));
+            }
         } else {
-            writer.append(new ObjectMapper().writeValueAsString(order));
+            List<Order> orderList = dao.getAllOrders();
+            writer.append(new ObjectMapper().writeValueAsString(orderList));
         }
+
     }
 
     @Override
@@ -58,7 +62,6 @@ public class OrderServlet extends HttpServlet {
         resp.setContentType("application/json");
 
         if (order.getOrderNumber() == null) {
-            logger.warning("Order number not entered.");
             return;
         }
         order = dao.insertOrder(order);

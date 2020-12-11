@@ -6,20 +6,17 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import order.Order;
 import order.Order.OrderRow;
-import org.apache.logging.log4j.LogManager;
 import util.FileUtil;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class Dao {
     private DataSource pool;
-    private Logger logger;
     public Dao(DataSource pool) {
         this.pool = pool;
-        logger = Logger.getLogger("logger");
 
     }
 
@@ -64,9 +61,31 @@ public class Dao {
         }catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
-            logger.severe("Could not process order rows from JSON");
+            e.printStackTrace();
         }
         return order;
+    }
+
+    public List<Order> getAllOrders() {
+        List<Order> orderList = new ArrayList<>();
+        String query = "SELECT id, order_number, order_rows FROM hw_order";
+        try (Connection conn = pool.getConnection(); Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                Long orderId = rs.getLong("id");
+                String orderNumber = rs.getString("order_number");
+                String orderRows = rs.getString("order_rows");
+                List<OrderRow> orderRowList = new ObjectMapper().readValue(orderRows, new TypeReference<List<OrderRow>>(){});
+                orderList.add(new Order(orderId, orderNumber, orderRowList));
+            }
+
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return orderList;
     }
 
     private void executeQuery(String file) {
