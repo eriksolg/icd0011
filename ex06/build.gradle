@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    jcenter()
+}
+
+sourceCompatibility = 11
+
+def springVersion = '5.2.9.RELEASE'
+def log4jVersion = '2.13.3'
+def lombokVersion = '1.18.12'
+def hsqldbVersion = '2.5.1'
+def aspectjWeaverVersion = '1.9.6'
+def postgresVersion = '42.2.16'
+
+dependencies {
+
+    implementation group: 'org.springframework',
+            name: 'spring-context',
+            version: springVersion
+
+    implementation group: 'org.springframework',
+            name: 'spring-jdbc',
+            version: springVersion
+
+    implementation group: 'org.springframework',
+            name: 'spring-aop',
+            version: springVersion
+
+    implementation group: 'org.aspectj',
+            name: 'aspectjweaver',
+            version: aspectjWeaverVersion
+
+    implementation group: 'org.postgresql',
+            name: 'postgresql',
+            version: postgresVersion
+
+    implementation group: 'org.hsqldb',
+            name: 'hsqldb',
+            version: hsqldbVersion
+
+    implementation group: 'org.apache.logging.log4j',
+            name: 'log4j-api',
+            version: log4jVersion
+
+    implementation group: 'org.apache.logging.log4j',
+            name: 'log4j-core',
+            version: log4jVersion
+
+    compileOnly group: 'org.projectlombok',
+            name: 'lombok',
+            version: lombokVersion
+
+    annotationProcessor group: 'org.projectlombok',
+            name: 'lombok',
+            version: lombokVersion
+
+}
+
+task runMain(type: JavaExec) {
+    main = 'main.Main'
+    classpath = sourceSets.main.runtimeClasspath
+}

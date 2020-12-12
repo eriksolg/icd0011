@@ -1,9 +1,11 @@
 package servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import config.Config;
+import config.PostgresDataSource;
 import db.Dao;
 import order.Order;
-import util.JsonParser;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import util.RequestReader;
 
 import javax.servlet.ServletException;
@@ -11,10 +13,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 
 @WebServlet("/api/orders")
@@ -24,7 +24,8 @@ public class OrderServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        this.dao = (Dao) getServletContext().getAttribute("dao");
+        var ctx = new AnnotationConfigApplicationContext(Config.class, PostgresDataSource.class);
+        this.dao = ctx.getBean(Dao.class);
         super.init();
     }
 

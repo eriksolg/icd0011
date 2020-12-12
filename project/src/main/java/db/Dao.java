@@ -1,103 +1,56 @@
 package db;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import order.Order;
 import order.Order.OrderRow;
-import util.FileUtil;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class Dao {
-    private DataSource pool;
-    public Dao(DataSource pool) {
-        this.pool = pool;
-
+    private JdbcTemplate template;
+    public Dao(JdbcTemplate template) {
+        this.template = template;
     }
 
     public Order insertOrder(Order order) {
-        String query = "INSERT INTO hw_order (order_number, order_rows) VALUES (?, ?)";
-        try (Connection conn = pool.getConnection(); PreparedStatement stmt = conn.prepareStatement(query, new String[] { "id" })) {
+        var orderData = new BeanPropertySqlParameterSource(order);
+        Number orderId = new SimpleJdbcInsert(template).withTableName("hw_order").usingGeneratedKeyColumns("id").executeAndReturnKey(orderData);
+        order.setId(orderId.longValue());
 
-            stmt.setString(1, order.getOrderNumber());
-            stmt.setString(2, new ObjectMapper().writeValueAsString(order.getOrderRows()));
-            stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (!rs.next()) {
-                throw new RuntimeException("unexpected error!");
-            }
-
-            order.setId(rs.getLong("id"));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not serialize orderRows");
+        for (OrderRow orderRow : order.getOrderRows()) {
+            var orderRowData = new BeanPropertySqlParameterSource(orderRow);
+            new SimpleJdbcInsert(template).withTableName("hw_order_row").usingGeneratedKeyColumns("id").execute(orderRowData);
         }
 
         return order;
     }
 
     public Order getOrderById(Long id) {
-        Order order = null;
-        String query = "SELECT id, order_number, order_rows FROM hw_order WHERE id = ?";
-        try (Connection conn = pool.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Long orderId = rs.getLong("id");
-                String orderNumber = rs.getString("order_number");
-                String orderRows = rs.getString("order_rows");
-                List<OrderRow> orderRowList = new ObjectMapper().readValue(orderRows, new TypeReference<List<OrderRow>>(){});
-                order = new Order(orderId, orderNumber, orderRowList);
-            }
-
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return order;
+        String orderQuery = "SELECT id, order_number FROM hw_order WHERE id=?";
+        return template.queryForObject(orderQuery, new BeanPropertyRowMapper<>(Order.class), id);
     }
 
     public List<Order> getAllOrders() {
         List<Order> orderList = new ArrayList<>();
-        String query = "SELECT id, order_number, order_rows FROM hw_order";
-        try (Connection conn = pool.getConnection(); Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
+        String orderQuery = "SELECT id, order_number FROM hw_order";
 
-            while (rs.next()) {
-                Long orderId = rs.getLong("id");
-                String orderNumber = rs.getString("order_number");
-                String orderRows = rs.getString("order_rows");
-                List<OrderRow> orderRowList = new ObjectMapper().readValue(orderRows, new TypeReference<List<OrderRow>>(){});
-                orderList.add(new Order(orderId, orderNumber, orderRowList));
-            }
+        orderList = template.query(orderQuery, new BeanPropertyRowMapper<>(Order.class));
 
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        for(Order order : orderList) {
+            order.setOrderRows(getOrderRows(order.getId()));
         }
         return orderList;
     }
 
-    private void executeQuery(String file) {
-        try (Connection conn = pool.getConnection(); Statement stmt = conn.createStatement()) {
-            String query = FileUtil.readFileFromClasspath(file);
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void initializeSchema() {
-        executeQuery("schema.sql");
+    private List<OrderRow> getOrderRows(Long id) {
+        String orderRowQuery = "SELECT hw_order_row.item_name, hw_order_row.quantity, hw_order_row.price FROM hw_order LEFT JOIN hw_order_row ON hw_order.id = hw_order_row.order_id WHERE order_id = ?";
+        return template.query(orderRowQuery,new BeanPropertyRowMapper<>(OrderRow.class), id);
     }
 }

@@ -28,6 +28,8 @@ public class Order {
     }
 
     @Getter
+    @Setter
+    @AllArgsConstructor
     public static class OrderRow {
         private String itemName;
         private int quantity;

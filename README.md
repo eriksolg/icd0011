@@ -13,3 +13,9 @@ REST, manual JSON parsing.
 
 ## Ex04
 JDBC: pool and connection reusage, Dao, DB queries.
+
+## Ex05
+JDBC: batch operations
+
+## Ex06
+Spring core
