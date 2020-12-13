@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class Dao {
@@ -25,8 +26,9 @@ public class Dao {
         order.setId(orderId.longValue());
 
         for (OrderRow orderRow : order.getOrderRows()) {
+            orderRow.setOrderId(order.getId());
             var orderRowData = new BeanPropertySqlParameterSource(orderRow);
-            new SimpleJdbcInsert(template).withTableName("hw_order_row").usingGeneratedKeyColumns("id").execute(orderRowData);
+            new SimpleJdbcInsert(template).withTableName("hw_order_row").usingGeneratedKeyColumns("id").usingColumns().execute(orderRowData);
         }
 
         return order;
@@ -34,7 +36,10 @@ public class Dao {
 
     public Order getOrderById(Long id) {
         String orderQuery = "SELECT id, order_number FROM hw_order WHERE id=?";
-        return template.queryForObject(orderQuery, new BeanPropertyRowMapper<>(Order.class), id);
+        List<OrderRow> orderRows = getOrderRows(id);
+        Order order = template.queryForObject(orderQuery, new BeanPropertyRowMapper<>(Order.class), id);
+        order.setOrderRows(orderRows);
+        return order;
     }
 
     public List<Order> getAllOrders() {

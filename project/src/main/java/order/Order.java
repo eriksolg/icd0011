@@ -1,5 +1,6 @@
 package order;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,9 @@ public class Order {
     @Getter
     @Setter
     @AllArgsConstructor
+    @JsonIgnoreProperties(value = { "orderId" })
     public static class OrderRow {
+        private Long orderId;
         private String itemName;
         private int quantity;
         private Double price;
