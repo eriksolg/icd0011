@@ -6,11 +6,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan(basePackages = {"config, db"})
+@EnableWebMvc
+@ComponentScan(basePackages = {"config", "db", "controller", "service"})
 public class Config {
 
     @Bean

@@ -18,4 +18,7 @@ JDBC: pool and connection reusage, Dao, DB queries.
 JDBC: batch operations
 
 ## Ex06
-Spring core
+Spring core, AOP
+
+## Ex07
+Spring MVC, validation

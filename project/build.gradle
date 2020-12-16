@@ -9,14 +9,25 @@ repositories {
 }
 
 def springVersion = '5.3.2'
+def hibernateValidatorVersion = '6.1.6.Final'
+
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
-    implementation group: 'javax.servlet',
-            name: 'javax.servlet-api',
-            version: '4.0.1'
+    implementation group: 'org.springframework',
+            name: 'spring-webmvc',
+            version: springVersion
+
+    implementation group: 'org.springframework',
+            name: 'spring-jdbc',
+            version: springVersion
+
+    implementation group: 'org.hibernate',
+            name: 'hibernate-validator',
+            version: hibernateValidatorVersion
+
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.0'
+
+
     implementation group: 'org.apache.commons',
             name: 'commons-dbcp2',
             version: '2.8.0'
@@ -27,17 +38,6 @@ dependencies {
             name: 'jackson-databind',
             version: '2.12.0'
 
-    implementation group: 'org.springframework',
-            name: 'spring-context',
-            version: springVersion
-
-    implementation group: 'org.springframework',
-            name: 'spring-jdbc',
-            version: springVersion
-
-    implementation group: 'org.springframework',
-            name: 'spring-aop',
-            version: springVersion
 
 }
 
