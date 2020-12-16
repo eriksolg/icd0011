@@ -22,3 +22,6 @@ Spring core, AOP
 
 ## Ex07
 Spring MVC, validation
+
+## Ex08
+Spring Boot
