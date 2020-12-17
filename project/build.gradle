@@ -10,6 +10,7 @@ repositories {
 
 def springVersion = '5.3.2'
 def hibernateValidatorVersion = '6.1.6.Final'
+def hibernateVersion = '5.4.26.Final'
 
 
 dependencies {
@@ -24,6 +25,15 @@ dependencies {
     implementation group: 'org.hibernate',
             name: 'hibernate-validator',
             version: hibernateValidatorVersion
+
+    implementation group: 'org.springframework',
+            name: 'spring-orm',
+            version: springVersion
+
+    implementation group: 'org.hibernate',
+            name: 'hibernate-core',
+            version: hibernateVersion
+
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.0'
 

@@ -21,4 +21,10 @@ public class PostgresDataSource {
         ds.setUrl(env.getProperty("postgres.url"));
         return ds;
     }
+    @Bean("dialect")
+    public String dialect() {
+        return "org.hibernate.dialect.PostgreSQL10Dialect";
+    }
 }
+
+

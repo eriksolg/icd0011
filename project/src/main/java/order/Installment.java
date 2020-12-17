@@ -9,6 +9,6 @@ import java.util.Date;
 @Setter
 @Getter
 public class Installment {
-    private Double amount;
+    private double amount;
     private LocalDate date;
 }

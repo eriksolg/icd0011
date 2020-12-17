@@ -25,3 +25,6 @@ Spring MVC, validation
 
 ## Ex08
 Spring Boot
+
+## Ex09
+JPA, Hibernate

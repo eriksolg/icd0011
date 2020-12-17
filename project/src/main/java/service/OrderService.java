@@ -3,6 +3,7 @@ package service;
 import db.Dao;
 import order.Installment;
 import order.Order;
+import order.OrderRow;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +26,15 @@ public class OrderService {
 
     public List<Installment> getInstallments(Long id, LocalDate start, LocalDate end) {
         List<Installment> installments = new ArrayList<>();
-        Double sum = getOrderSum(id);
+        int sum = getOrderSum(id);
 
         Long payments = ChronoUnit.MONTHS.between(YearMonth.from(start), YearMonth.from(end)) + 1;
         System.out.println(payments);
-        Double amount = Math.floor(sum/payments);
+        double amount = Math.floor(sum/payments);
         for (int i = 0; i<payments; i++) {
             Installment installment = new Installment();
             if (i == payments - 1) {
-                installment.setAmount(sum);
+                installment.setAmount((double) sum);
             } else {
                 installment.setAmount(amount);
             }
@@ -50,11 +51,11 @@ public class OrderService {
         return installments;
     }
 
-    public Double getOrderSum(Long id) {
+    public int getOrderSum(Long id) {
         Order order = dao.getOrderById(id);
-        List<Order.OrderRow> orderRows = order.getOrderRows();
-        Double sum = 0.0;
-        for (Order.OrderRow orderRow : orderRows) {
+        List<OrderRow> orderRows = order.getOrderRows();
+        int sum = 0;
+        for (OrderRow orderRow : orderRows) {
             sum += orderRow.getPrice();
         }
         System.out.println(sum);
