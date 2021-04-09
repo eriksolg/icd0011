@@ -1,5 +1,5 @@
-order/Order.java
- order.Order
+config/Initializer.java
+ config.Initializer
 order/Installment.java
  order.Installment
 util/RequestReader.java
@@ -10,11 +10,11 @@ config/PostgresDataSource.java
  config.PostgresDataSource
 order/OrderRow.java
  order.OrderRow
-service/OrderService.java
- service.OrderService
-config/Initializer.java
- config.Initializer
-db/Dao.java
- db.Dao
+order/Order.java
+ order.Order
 controller/OrderController.java
  controller.OrderController
+service/OrderService.java
+ service.OrderService
+db/Dao.java
+ db.Dao
